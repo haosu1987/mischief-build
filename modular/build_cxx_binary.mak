@@ -4,8 +4,6 @@ $(call module_get_vars,$(MODULE_NAME))
 
 build_$(MODULE_NAME): $(MODULE_TARGET)
 
-ifneq ($(strip $(MODULE_TARGET)),)
-
 $(MODULE_TARGET): module_name := $(MODULE_NAME)
 
 MODULE_TARGET_DEPS := $(call module_expand_target_deps,$(MODULE_NAME))
@@ -45,4 +43,3 @@ clean_$(MODULE_NAME)_deps: $(addprefix clean_,$(call module_expand_deps,$(MODULE
 
 clean_$(MODULE_NAME): module_name := $(MODULE_NAME)
 
-endif

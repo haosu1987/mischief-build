@@ -1,13 +1,12 @@
+ifneq ($(strip $(MODULE_SRC_FILES)),)
 
 MODULE_OUT_PATH := $(OUT)/$(MODULE_PATH)
 
 MODULE_TYPE_SELECTIONS := shared static binary both
 
-ifneq ($(strip $(MODULE_SRC_FILES)),)
 MODULE_STATIC_LIBRARY += $(MODULE_OUT_PATH)/lib$(MODULE_NAME).a
 MODULE_SHARED_LIBRARY += $(MODULE_OUT_PATH)/lib$(MODULE_NAME).so
 MODULE_EXECUTE_BINARY += $(MODULE_OUT_PATH)/$(MODULE_NAME)
-endif
 
 ifneq ($(filter-out $(MODULE_TYPE_SELECTIONS),$(MODULE_TYPE)),)
 $(error MODULE_TYPE should be evalued as '$(MODULE_TYPE_SELECTIONS)')
@@ -42,6 +41,8 @@ MODULE_MAKEFILE := $(MODULAR_BUILD_CXX_BINARY)
 
 MODULE_CFLAGS += -fPIC -MMD
 
-$(call module_put_vars, $(MODULE_NAME))
-
 MODULAR_LIST += $(MODULE_NAME)
+
+endif
+
+$(call module_put_vars, $(MODULE_NAME))

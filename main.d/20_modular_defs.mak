@@ -88,6 +88,10 @@ define module_load_deps
 $(foreach mod,$(call module_var_load,$(1),LIBRARY_DEPS),$(mod) $(call module_load_deps,$(mod)))
 endef
 
+define module_load_ldlib
+$(if $(call module_load_target,$(1)),$(1))
+endef
+
 define module_expand_deps
 $(call uniq,$(2) $(foreach m,$(call module_load_deps,$(1)),$(m)))
 endef
@@ -107,6 +111,6 @@ endef
 
 define module_expand_ldflags
 $(addprefix -L,$(call module_expand_deps_with,$(1),module_load_ldpath)) \
-$(addprefix -l,$(call module_expand_deps,$(1))) \
+$(addprefix -l,$(call module_expand_deps_with,$(1),module_load_ldlib)) \
 $(call module_var_load,$(1),LDFLAGS)
 endef
