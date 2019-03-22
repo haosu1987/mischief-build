@@ -39,7 +39,7 @@ clean_$(MODULE_NAME):
 	$(HIDE)echo "remove $(module_name)"
 	$(HIDE)$(RM) -rf $(call module_load_cleanable,$(module_name))
 
-clean_$(MODULE_NAME)_deps: $(addprefix clean_,$(call module_expand_deps,$(MODULE_NAME)) $(MODULE_NAME))
+clean_$(MODULE_NAME)_deps: $(addprefix clean_,$(call module_expand_library_name,$(MODULE_NAME)) $(MODULE_NAME))
 
 clean_$(MODULE_NAME): module_name := $(MODULE_NAME)
 

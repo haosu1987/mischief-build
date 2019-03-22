@@ -4,16 +4,24 @@
 
 MODULAR_PATH := $(BUILD_CORE_PATH)/modular
 
-MODULAR_CLEAR_VARIABLES             := $(MODULAR_PATH)/clear_variables.mak
+MODULAR_VARIABLES_INIT				:= $(MODULAR_PATH)/variables_init.mak
 
-MODULAR_PREBUILD_CXX_BINARY         := $(MODULAR_PATH)/prebuild_cxx_binary.mak
-MODULAR_BUILD_CXX_BINARY   			:= $(MODULAR_PATH)/build_cxx_binary.mak
+MODULAR_CXX_PREBUILD				:= $(MODULAR_PATH)/cxx_prebuild.mak
+MODULAR_CXX_BUILD					:= $(MODULAR_PATH)/cxx_build.mak
+
+define modular_init
+$(eval include $(MODULAR_VARIABLES_INIT))
+endef
+
+define modular_build_cxx
+$(eval include $(MODULAR_CXX_PREBUILD))
+endef
 
 ##
 # Record the variables list
 ##
 
-MODULAR_VARIABLES := $(call obtain_variables,$(MODULAR_CLEAR_VARIABLES))
+MODULAR_VARIABLES := $(call obtain_variables,$(MODULAR_VARIABLES_INIT))
 
 MODULAR_VARIABLES += MODULE_PATH
 
@@ -88,8 +96,8 @@ define module_load_deps
 $(foreach mod,$(call module_var_load,$(1),LIBRARY_DEPS),$(mod) $(call module_load_deps,$(mod)))
 endef
 
-define module_load_ldlib
-$(if $(call module_load_target,$(1)),$(1))
+define module_load_library_name
+$(if $(filter %/lib$(1).a %/lib$(1).so,$(call module_load_target,$(1))),$(1))
 endef
 
 define module_expand_deps
@@ -104,6 +112,10 @@ define module_expand_target_deps
 $(call module_expand_deps_with,$(1),module_load_target)
 endef
 
+define module_expand_library_name
+$(call module_expand_deps_with,$(1),module_load_library_name)
+endef
+
 define module_expand_cflags
 $(addprefix -I,$(call module_expand_deps_with,$(1),module_load_includes,$(1))) \
 $(call module_var_load,$(1),CFLAGS)
@@ -111,6 +123,28 @@ endef
 
 define module_expand_ldflags
 $(addprefix -L,$(call module_expand_deps_with,$(1),module_load_ldpath)) \
-$(addprefix -l,$(call module_expand_deps_with,$(1),module_load_ldlib)) \
+$(addprefix -l,$(call module_expand_library_name,$(1))) \
 $(call module_var_load,$(1),LDFLAGS)
 endef
+
+##
+# Build all the modules
+##
+
+MODULAR_LIST :=
+
+.PHONY: clean build
+
+all: build
+
+## Prebuild
+$(call include-module-under,$(WORKDIR))
+
+## Building
+$(foreach MODULE_NAME,$(MODULAR_LIST),\
+	$(eval include $(call module_load_makefile,$(MODULE_NAME))) \
+)
+
+clean: $(addprefix clean_,$(MODULAR_LIST))
+
+build: $(addprefix build_,$(MODULAR_LIST))

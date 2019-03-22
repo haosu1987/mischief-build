@@ -36,14 +36,6 @@ define my-dir
 $(patsubst %/,%,$(dir $(call latest-val, $(MAKEFILE_LIST))))
 endef
 
-define upper
-$(shell echo $(strip $(1)) | tr '[a-z]' '[A-Z]')
-endef
-
-define lower
-$(shell echo $(strip $(1)) | tr '[A-Z]' '[a-z]')
-endef
-
 define obtain_variables
 $(eval _variables := $(.VARIABLES))\
 $(eval include $(1))\
