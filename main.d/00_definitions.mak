@@ -5,12 +5,27 @@ C_SUFFIX ?= .c .cc
 CXX_SUFFIX ?= .cpp .cxx
 OBJ_SUFFIX ?= .o
 
-define findall
-$(shell find $(1) -name .git -prune -o -name out -prune -o -name $(2) -print)
+IGNORE_PATH ?= out .git .gitignore
+
+define expand-files-under
+$(filter-out $(addprefix %/,$(2)),$(wildcard $(1)/*))
 endef
 
-define find_all_module_mak
-$(call findall,$(1),module.mak)
+define find-files-under
+$(eval files := $(call expand-files-under,$(2),$(3)))\
+$(if $(filter $(2)/$(1),$(files)),$(2)/$(1),$(foreach dir,$(files),$(call find-files-under,$(1),$(dir),$(3))))
+endef
+
+define find-module-make-under
+$(call find-files-under,module.mak,$(1),$(IGNORE_PATH))
+endef
+
+define include-module-under
+$(eval include $(call find-module-make-under,$(1)))
+endef
+
+define include-submodule-under
+$(foreach d,$(wildcard $(1)/*),$(call include-module-under,$(d)))
 endef
 
 define latest-val

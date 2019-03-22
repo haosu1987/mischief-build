@@ -5,7 +5,7 @@ MODULAR_LIST :=
 all: build
 
 ## Prebuild
-include $(call find_all_module_mak,$(WORKDIR))
+$(call include-module-under,$(WORKDIR))
 
 ## Building
 $(foreach MODULE_NAME,$(MODULAR_LIST),\

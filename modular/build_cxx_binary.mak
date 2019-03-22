@@ -1,15 +1,17 @@
 $(call module_get_vars,$(MODULE_NAME))
 
+.PHONY: build_$(MODULE_NAME) clean_$(MODULE_NAME) clean_$(MODULE_NAME)_deps
+
+build_$(MODULE_NAME): $(MODULE_TARGET)
+
+ifneq ($(strip $(MODULE_TARGET)),)
+
+$(MODULE_TARGET): module_name := $(MODULE_NAME)
+
 MODULE_TARGET_DEPS := $(call module_expand_target_deps,$(MODULE_NAME))
 
 MODULE_C_OBJS := $(call filter-by-suffix,$(C_SUFFIX),$(OBJ_SUFFIX),$(MODULE_OBJECTS))
 MODULE_CXX_OBJS := $(call filter-by-suffix,$(CXX_SUFFIX),$(OBJ_SUFFIX),$(MODULE_OBJECTS))
-
-.PHONY: build_$(MODULE_NAME) clean_$(MODULE_NAME) clean_$(MODULE_NAME)_deps
-
-$(MODULE_TARGET): module_name := $(MODULE_NAME)
-
-build_$(MODULE_NAME): $(MODULE_TARGET)
 
 $(MODULE_EXECUTE_BINARY):$(MODULE_TARGET_DEPS) $(MODULE_OBJECTS)
 	$(HIDE)echo "$(module_name) [LN] $@"
@@ -42,3 +44,5 @@ clean_$(MODULE_NAME):
 clean_$(MODULE_NAME)_deps: $(addprefix clean_,$(call module_expand_deps,$(MODULE_NAME)) $(MODULE_NAME))
 
 clean_$(MODULE_NAME): module_name := $(MODULE_NAME)
+
+endif
