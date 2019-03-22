@@ -1,8 +1,8 @@
 HIDE ?= @
 SKIP ?=
 
-C_SUFFIX ?= .c .cc
-CXX_SUFFIX ?= .cpp .cxx
+C_SUFFIX ?= .c
+CXX_SUFFIX ?= .cpp .cxx .cc
 OBJ_SUFFIX ?= .o
 
 IGNORE_PATH ?= out .git .gitignore
