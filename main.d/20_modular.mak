@@ -148,3 +148,6 @@ $(foreach MODULE_NAME,$(MODULAR_LIST),\
 clean: $(addprefix clean_,$(MODULAR_LIST))
 
 build: $(addprefix build_,$(MODULAR_LIST))
+
+list_modules:
+	$(HIDE)echo $(MODULAR_LIST)

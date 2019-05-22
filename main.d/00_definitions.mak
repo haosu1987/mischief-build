@@ -7,17 +7,36 @@ OBJ_SUFFIX ?= .o
 
 IGNORE_PATH ?= out .git .gitignore
 
-define expand-files-under
+##
+# Wildcard all files and paths under the path, 
+# and exclude assigned paths or files.
+#
+# $(1): the root path that will be expanded
+# $(2): the exclude files or paths.
+##
+define wildcard-under
 $(filter-out $(addprefix %/,$(2)),$(wildcard $(1)/*))
 endef
 
-define find-files-under
-$(eval files := $(call expand-files-under,$(2),$(3)))\
-$(if $(filter $(2)/$(1),$(files)),$(2)/$(1),$(foreach dir,$(files),$(call find-files-under,$(1),$(dir),$(3))))
+##
+# Find the first file under the path.
+#
+# $(1): the target path
+# $(2): the target file or path will be found
+# $(3): the exclude path that not search in.
+##
+define find-first
+$(if $(wildcard $(1)/$(2)),\
+	$(1)/$(2),\
+	$(foreach dir,\
+		$(call wildcard-under,$(1),$(3)),\
+		$(call find-first,$(dir),$(2),$(3))\
+	)\
+)
 endef
 
 define find-module-make-under
-$(call find-files-under,module.mak,$(1),$(IGNORE_PATH))
+$(call find-first,$(1),module.mak,$(IGNORE_PATH))
 endef
 
 define include-module-under
